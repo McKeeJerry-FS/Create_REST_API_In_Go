@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+
 	"github.com/gorilla/mux"
 )
 
@@ -35,6 +37,7 @@ func handleRequest(){
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/all", getAllArticles)
+	myRouter.HandleFunc("/article", createNewArticle).Methods("POST")
 	myRouter.HandleFunc("/article/{id}", getArticleById)
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
@@ -61,9 +64,23 @@ func getArticleById(w http.ResponseWriter, r *http.Request) {
 	key := vars["id"]
 
 	fmt.Fprintf(w, "Key: " + key)
+	// loop over all of the articles
 	for _, article := range Articles {
+		// if the article's id matches the key that was passed in
 		if article.Id == key {
+			// return the article
 			json.NewEncoder(w).Encode(article)
 		}
 	}
+}
+
+// Creating a function to Create a new article
+func createNewArticle(w http.ResponseWriter, r *http.Request){
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	fmt. Fprintf(w, "Successfully created the new article")
+	var article Article
+	json.Unmarshal(reqBody, &article)
+
+	Articles = append(Articles, article)
+	json.NewEncoder(w).Encode(article)
 }
