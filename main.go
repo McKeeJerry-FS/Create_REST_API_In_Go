@@ -95,7 +95,9 @@ func deleteArticle(w http.ResponseWriter, r *http.Request){
 
 	for index, article := range Articles{
 		if article.Id == id {
-			Articles = append(Articles[:index], Articles[index+1:]... )
+			Articles = append(Articles[:index], Articles[index+1:]... )	
+			fmt.Println("Article successfully deleted!")	
 		}
+		fmt.Println("Article was not found")
 	}
 }
