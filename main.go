@@ -38,6 +38,7 @@ func handleRequest(){
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/all", getAllArticles)
 	myRouter.HandleFunc("/article", createNewArticle).Methods("POST")
+	myRouter.HandleFunc("/article/{id}", deleteArticle).Methods("DELETE")
 	myRouter.HandleFunc("/article/{id}", getArticleById)
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
@@ -76,11 +77,25 @@ func getArticleById(w http.ResponseWriter, r *http.Request) {
 
 // Creating a function to Create a new article
 func createNewArticle(w http.ResponseWriter, r *http.Request){
+	// get the body of the POST request 
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	fmt. Fprintf(w, "Successfully created the new article")
 	var article Article
+	// unmarshal it into a new article struct
 	json.Unmarshal(reqBody, &article)
-
+	// append the article into the current array of articles
 	Articles = append(Articles, article)
 	json.NewEncoder(w).Encode(article)
+}
+
+//create a function to delete an article 
+func deleteArticle(w http.ResponseWriter, r *http.Request){
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	for index, article := range Articles{
+		if article.Id == id {
+			Articles = append(Articles[:index], Articles[index+1:]... )
+		}
+	}
 }
