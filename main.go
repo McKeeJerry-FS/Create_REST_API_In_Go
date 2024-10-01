@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,7 +24,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequest(){
+	// homepage route
 	http.HandleFunc("/", homePage)
+	// articles route
+	http.HandleFunc("/articles", getAllArticles)
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 
@@ -33,4 +37,10 @@ func main() {
         {Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
     }
 	handleRequest()
+}
+
+// creating a function to retrieve all articles 
+func getAllArticles(w http.ResponseWriter, r *http.Request){
+	fmt.Println("Endpoint Hit: getAllArticles")
+	json.NewEncoder(w).Encode(Articles)
 }
